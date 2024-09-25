@@ -1,1 +1,1 @@
-web: npm run start:prod
+web: npm run puppeteer-install && npm run start:prod

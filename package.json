@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/main",
     "build": "node node_modules/@nestjs/cli/bin/nest.js build",
-    "start:prod": "node dist/main"
+    "start:prod": "node dist/main",
+    "puppeteer-install": "npx puppeteer browsers install chrome"
   },
   "keywords": [],
   "author": "",

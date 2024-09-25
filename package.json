@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node-dev src/main.ts"
+    "start": "nest start",
+    "build": "nest build",
+    "start:prod": "node dist/main"
   },
   "keywords": [],
   "author": "",
@@ -23,5 +25,8 @@
     "@types/node": "^22.7.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.6.2"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }

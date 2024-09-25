@@ -51,6 +51,8 @@ export class ProductsService {
     });
 
     await browser.close();
+
+    console.log({products});
     
     // Save each product to MongoDB
     const savedProducts = await Promise.all(

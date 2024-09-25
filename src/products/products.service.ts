@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Product } from './schemas/product.schema';
 
 @Injectable()
 export class ProductsService {
+  constructor(@InjectModel('Product') private productModel: Model<Product>) {}
+
   async scrapeProducts(storeUrl: string): Promise<any> {
     const browser = await puppeteer.launch({
       headless: true,
@@ -46,6 +51,15 @@ export class ProductsService {
     });
 
     await browser.close();
-    return products;
+    
+    // Save each product to MongoDB
+    const savedProducts = await Promise.all(
+      products.map(async (product) => {
+        const newProduct = new this.productModel(product);
+        return newProduct.save();
+      }),
+    );
+
+    return savedProducts;
   }
 }

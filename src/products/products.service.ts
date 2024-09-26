@@ -107,9 +107,20 @@ export class ProductsService {
   private async saveProducts(products: any[]): Promise<any[]> {
     return await Promise.all(
       products.map(async (product) => {
+        // Check if product exists by link
+        const existingProduct = await this.productModel.findOne({ link: product.link });
+        if (existingProduct) {
+          // Optionally update the existing product if needed
+          return this.productModel.updateOne({ link: product.link }, product);
+        }
+        // Save new product if not found
         const newProduct = new this.productModel(product);
         return newProduct.save();
       }),
     );
+  }
+  
+  async getProducts(): Promise<Product[]> {
+    return this.productModel.find().exec();
   }
 }

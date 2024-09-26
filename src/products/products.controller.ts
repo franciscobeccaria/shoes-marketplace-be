@@ -15,6 +15,11 @@ export class ProductsController {
     return this.productsService.scrapeGrid();
   }
 
+  @Get()
+  async getProducts() {
+    return this.productsService.getProducts();
+  }
+
   // Simple GET route for testing
   @Get('test')
   async getTest(): Promise<any> {

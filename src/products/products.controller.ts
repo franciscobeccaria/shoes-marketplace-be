@@ -1,13 +1,18 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ProductsService } from './products.service';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @Get('scrape')
-  async scrapeProducts(@Query('storeUrl') storeUrl: string): Promise<any> {
-    return this.productsService.scrapeProducts(storeUrl);
+  @Get('scrape/adidas')
+  async scrapeAdidas() {
+    return this.productsService.scrapeAdidas();
+  }
+
+  @Get('scrape/grid')
+  async scrapeGrid() {
+    return this.productsService.scrapeGrid();
   }
 
   // Simple GET route for testing

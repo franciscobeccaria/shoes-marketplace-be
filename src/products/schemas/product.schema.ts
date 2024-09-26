@@ -5,6 +5,7 @@ export const ProductSchema = new Schema({
   price: String,
   image: String,
   link: { type: String, unique: true },
+  store: String,
 });
 
 export interface Product extends Document {
@@ -12,4 +13,5 @@ export interface Product extends Document {
   price: string;
   image: string;
   link: string;
+  store: string;
 }

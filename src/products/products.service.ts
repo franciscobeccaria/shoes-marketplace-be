@@ -9,6 +9,8 @@ export class ProductsService {
   constructor(@InjectModel('Product') private productModel: Model<Product>) {}
 
   async scrapeAdidas(): Promise<any> {
+    await this.productModel.deleteMany({ store: 'adidas' });
+
     const browser = await puppeteer.launch({
       headless: true,
       args: [
@@ -47,6 +49,7 @@ export class ProductsService {
           price: item.querySelector('.gl-price-item')?.textContent || 'N/A',
           image: item.querySelector('img')?.src || 'N/A',
           link: item.querySelector('a')?.href || 'N/A',
+          store: 'adidas',
         };
         results.push(product);
       });
@@ -58,6 +61,8 @@ export class ProductsService {
   }
 
   async scrapeGrid(): Promise<any> {
+    await this.productModel.deleteMany({ store: 'grid' });
+
     const browser = await puppeteer.launch({
       headless: true,
       args: [
@@ -94,6 +99,7 @@ export class ProductsService {
           price: item.querySelector('.vtex-store-components-3-x-priceContainer').textContent || 'N/A',
           image: item.querySelector('img')?.src || 'N/A',
           link: item.querySelector('a')?.href || 'N/A',
+          store: 'grid',
         };
         results.push(product);
       });
@@ -107,13 +113,6 @@ export class ProductsService {
   private async saveProducts(products: any[]): Promise<any[]> {
     return await Promise.all(
       products.map(async (product) => {
-        // Check if product exists by link
-        const existingProduct = await this.productModel.findOne({ link: product.link });
-        if (existingProduct) {
-          // Optionally update the existing product if needed
-          return this.productModel.updateOne({ link: product.link }, product);
-        }
-        // Save new product if not found
         const newProduct = new this.productModel(product);
         return newProduct.save();
       }),

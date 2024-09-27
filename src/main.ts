@@ -2,11 +2,20 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  console.log('Starting NestJS application...'); // Logging the start of the app
-  
   const app = await NestFactory.create(AppModule);
 
-  // Ensure the app binds to the port provided by Heroku or fallback to 3000 for local development
+  const allowedOrigins = process.env.CORS_URLS ? process.env.CORS_URLS.split(',') : [];
+
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+  });
+
   const port = process.env.PORT || 3000;
   console.log(`App listening on port ${port}`); // Logging the port
 

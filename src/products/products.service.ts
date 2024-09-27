@@ -111,8 +111,13 @@ export class ProductsService {
   }
 
   private async saveProducts(products: any[]): Promise<any[]> {
+    const uniqueProducts = products.filter(
+      (product, index, self) =>
+        index === self.findIndex((p) => p.link === product.link),
+    );
+  
     return await Promise.all(
-      products.map(async (product) => {
+      uniqueProducts.map(async (product) => {
         const newProduct = new this.productModel(product);
         return newProduct.save();
       }),

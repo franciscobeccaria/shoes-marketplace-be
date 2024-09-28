@@ -115,9 +115,21 @@ export class ProductsService {
       (product, index, self) =>
         index === self.findIndex((p) => p.link === product.link),
     );
+
+    const formattedPriceProducts = uniqueProducts.map(product => {
+      const priceString = product.price;
+      const formattedPrice = priceString !== 'N/A' 
+        ? parseFloat(priceString.replace(/[^\d,]/g, '').replace(',', '.'))
+        : null;
+  
+      return {
+        ...product,
+        price: formattedPrice,
+      };
+    });
   
     return await Promise.all(
-      uniqueProducts.map(async (product) => {
+      formattedPriceProducts.map(async (product) => {
         const newProduct = new this.productModel(product);
         return newProduct.save();
       }),

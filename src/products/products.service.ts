@@ -3,6 +3,7 @@ import * as puppeteer from 'puppeteer';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product } from './schemas/product.schema';
+import { CreateProductDto } from './dto/create-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -30,7 +31,7 @@ export class ProductsService {
         '--no-zygote',
         '--single-process',
       ],
-      executablePath: process.env.CHROME_BIN || null,
+      executablePath: process.env.CHROME_BIN || undefined,
     });
 
     const page = await browser.newPage();
@@ -42,7 +43,7 @@ export class ProductsService {
 
     const products = await page.evaluate(() => {
       const items = document.querySelectorAll('.product-card_product-card__a9BIh');
-      const results = [];
+      const results: CreateProductDto[] = [];
       items.forEach(item => {
         const product = {
           name: item.querySelector('.product-card-description_name__xHvJ2')?.textContent || 'N/A',
@@ -82,7 +83,7 @@ export class ProductsService {
         '--no-zygote',
         '--single-process',
       ],
-      executablePath: process.env.CHROME_BIN || null,
+      executablePath: process.env.CHROME_BIN || undefined,
     });
 
     const page = await browser.newPage();
@@ -92,11 +93,11 @@ export class ProductsService {
 
     const products = await page.evaluate(() => {
       const items = document.querySelectorAll('.vtex-search-result-3-x-galleryItem');
-      const results = [];
+      const results: CreateProductDto[] = [];
       items.forEach(item => {
         const product = {
-          name: item.querySelector('.vtex-product-summary-2-x-productBrand.vtex-product-summary-2-x-productBrand--product-box.vtex-product-summary-2-x-brandName.vtex-product-summary-2-x-brandName--product-box.t-body').textContent || 'N/A',
-          price: item.querySelector('.vtex-store-components-3-x-priceContainer').textContent || 'N/A',
+          name: item.querySelector('.vtex-product-summary-2-x-productBrand.vtex-product-summary-2-x-productBrand--product-box.vtex-product-summary-2-x-brandName.vtex-product-summary-2-x-brandName--product-box.t-body')?.textContent || 'N/A',
+          price: item.querySelector('.vtex-store-components-3-x-priceContainer')?.textContent || 'N/A',
           image: item.querySelector('img')?.src || 'N/A',
           link: item.querySelector('a')?.href || 'N/A',
           store: 'grid',

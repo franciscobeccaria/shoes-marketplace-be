@@ -5,6 +5,26 @@ This project is a backend service designed to scrape and compare shoe prices fro
 
 Part of a larger initiative to compare product prices across Argentina, Chile, Brazil, and the USA, helping users understand price differences and dollar value variations between countries.
 
+## Known Issues
+
+### Adidas Scraper Blocked
+
+Currently, the scraper for `adidas.com.ar` is being blocked by their bot detection system. Despite using `puppeteer-extra` with the stealth plugin and disabling JavaScript, the site returns a 403 Forbidden page (see `adidas_debug_01_afterGoTo.png` in the project root for an example of the block page).
+
+**Screenshot of Block Page:**
+
+![Adidas Block Page](./adidas_debug_01_afterGoTo.png)
+
+*(Ensure `adidas_debug_01_afterGoTo.png` is present in the project root for this image to display)*
+
+**Likely Cause:**
+The block is likely due to advanced bot detection measures, such as IP reputation scoring, TLS fingerprinting, or sophisticated HTTP header analysis, which are difficult to bypass without more advanced techniques.
+
+**Recommended Solution:**
+To resolve this, the most effective approach is to integrate a **rotating proxy service**, preferably one that offers residential or mobile IP addresses. This will make the scraper's requests appear as organic traffic from various legitimate sources, significantly reducing the chances of being detected and blocked.
+
+When implementing a proxy, you would typically configure Puppeteer's launch arguments (e.g., `--proxy-server=YOUR_PROXY_IP:YOUR_PROXY_PORT`) and handle proxy authentication if needed (`page.authenticate()`).
+
 ## Tech Stack
 - **Framework**: NestJS
 - **Language**: TypeScript

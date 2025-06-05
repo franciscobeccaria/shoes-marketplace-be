@@ -3,4 +3,5 @@ export class CreateProductDto {
   price!: string;
   image!: string;
   link!: string;
+  store!: string;
 }

@@ -73,24 +73,59 @@ export class ProductsService {
         '--disable-gpu',
         '--disable-software-rasterizer',
         '--disable-extensions',
-        '--disable-background-networking',
-        '--disable-default-apps',
-        '--disable-sync',
-        '--disable-translate',
-        '--disable-features=site-per-process',
-        '--disable-site-isolation-trials',
-        '--disable-background-timer-throttling',
         '--no-zygote',
         '--single-process',
+        '--disable-gpu',
       ],
-      executablePath: process.env.CHROME_BIN || undefined,
     });
 
     const page = await browser.newPage();
 
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-    await page.goto('https://www.grid.com.ar/calzado/hombre?initialMap=genero&map=category-1,genero&order=OrderByReleaseDateDESC', { waitUntil: 'networkidle2' });
+    // Verbose event listeners - uncomment if deep debugging is required
+    /*
+    page.on('error', err => {
+      console.error('Puppeteer page error:', err);
+    });
+    page.on('pageerror', pageErr => {
+      console.error('Puppeteer page JavaScript error:', pageErr);
+    });
+    page.on('requestfailed', request => {
+      console.error('Puppeteer request failed:', request.url(), request.failure()?.errorText);
+    });
+    */
 
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+
+    try {
+      console.log(`Attempting to navigate to Grid with 60s timeout, waitUntil: 'load'...`);
+      await page.goto('https://www.grid.com.ar/calzado/hombre?initialMap=genero&map=category-1,genero&order=OrderByReleaseDateDESC', { waitUntil: 'load', timeout: 60000 }); 
+      await page.screenshot({ path: 'grid_debug_03_afterGoTo_SUCCESS.png', fullPage: true }); // Renamed for clarity
+      console.log('Screenshot taken after successful goto: grid_debug_03_afterGoTo_SUCCESS.png');
+    } catch (error) {
+      console.warn('Warning: page.goto timed out or failed. Proceeding with scraping attempt as screenshot indicated content might be present.');
+      if (error instanceof Error) {
+        console.error('page.goto error details: ', error.message);
+      } else {
+        console.error('page.goto encountered an unknown error: ', error);
+      }
+      try {
+        await page.screenshot({ path: 'grid_debug_04_goToTIMEDOUT_or_FAILED.png', fullPage: true }); // Renamed for clarity
+        console.log('Screenshot taken after goto timeout/failure: grid_debug_04_goToTIMEDOUT_or_FAILED.png');
+      } catch (screenshotError) {
+        if (screenshotError instanceof Error) {
+          console.error('Failed to take screenshot on goto error:', screenshotError.message);
+        } else {
+          console.error('Failed to take screenshot on goto error (unknown error type):', screenshotError);
+        }
+      }
+      // IMPORTANT: We are NOT re-throwing the error here to allow scraping attempt
+    }
+
+    // Add a small delay to ensure content is settled, especially if goto timed out
+    console.log('Adding a 5-second delay before attempting to evaluate page content...');
+    await new Promise(resolve => setTimeout(resolve, 5000)); 
+
+    console.log('Attempting to evaluate page content for products...');
     const products = await page.evaluate(() => {
       const items = document.querySelectorAll('.vtex-search-result-3-x-galleryItem');
       const results: CreateProductDto[] = [];
